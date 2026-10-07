@@ -1,0 +1,67 @@
+*,
+*::before,
+*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root { min-height: 100%; }
+
+body {
+  background: #07347e;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: none; }
+
+/* ---------- Типографика из макета ---------- */
+.pf {
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.15;
+  color: #f7f5e5;
+  word-break: break-word;
+}
+.gv {
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.15;
+  text-align: center;
+  word-break: break-word;
+}
+.gold { color: #d9b259; }
+a.menu-link { text-decoration: none; cursor: pointer; }
+
+/* ---------- Холст 430×2345, масштабируется под экран ---------- */
+.stage-wrap { display: flex; justify-content: center; width: 100%; overflow: hidden; }
+.stage-box { position: relative; }
+.stage {
+  position: absolute; left: 0; top: 0;
+  width: 430px; height: 2345px;
+  background: #fff;
+  transform-origin: top left;
+  overflow: hidden;
+}
+
+/* ---------- Солнце: вращение из Figma (−180° → 0°, 10.034 c, linear, бесконечно) ---------- */
+@keyframes sun-rot {
+  from { transform: rotate(-180deg); }
+  to   { transform: rotate(0deg); }
+}
+.sun-rot { animation: sun-rot 10.034s linear infinite; }
+
+/* ---------- Коты: покадровый цикл из Figma-прототипа ----------
+   Default 0.8 c → Variant2 0.8 c → Variant3 0.8 c → Variant4 (с сердечком) 1.6 c → заново.
+   Смена кадров мгновенная (transition: none). Всего 4.0 c. */
+.kiss-frame { position: absolute; opacity: 0; }
+.kiss-frame.f1 { opacity: 1; }
+.kiss.ready .kiss-frame { animation: 4s step-end infinite; }
+.kiss.ready .f1 { animation-name: kiss-1; }
+.kiss.ready .f2 { animation-name: kiss-2; }
+.kiss.ready .f3 { animation-name: kiss-3; }
+.kiss.ready .f4 { animation-name: kiss-4; }
+@keyframes kiss-1 { 0% { opacity: 1; } 20% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes kiss-2 { 0% { opacity: 0; } 20% { opacity: 1; } 40% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes kiss-3 { 0% { opacity: 0; } 40% { opacity: 1; } 60% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes kiss-4 { 0% { opacity: 0; } 60% { opacity: 1; } 100% { opacity: 1; } }
