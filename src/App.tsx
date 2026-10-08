@@ -1,15 +1,32 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { MENU_URL } from './config'
+import { A } from './assets'
+import Preloader from './Preloader'
+import { useTwinkle } from './twinkle'
 
-/* Все координаты — из Figma (кадр 430×2505, node 4084:179). */
+/* Все координаты — из Figma (кадр 430×2528 (после увеличения шрифтов в «Детали»), node 4084:179). */
 
-const A = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`
+/** true, когда прелоадер закончил работу и страница открывается — с этого момента идут анимации. */
+const RevealCtx = createContext(false)
 
-type BoxProps = { style?: CSSProperties; className?: string; children?: ReactNode }
+type BoxProps = {
+  style?: CSSProperties
+  className?: string
+  children?: ReactNode
+  /** участвует в случайной пульсации яркости */
+  twinkle?: boolean
+  /** дополнительно вспыхивает при наведении/касании */
+  hit?: boolean
+}
 
-const Abs = ({ style, className, children }: BoxProps) => (
-  <div className={className} style={{ position: 'absolute', ...style }}>
+const Abs = ({ style, className, children, twinkle, hit }: BoxProps) => (
+  <div
+    className={className}
+    data-twinkle={twinkle ? '' : undefined}
+    data-hit={hit ? '' : undefined}
+    style={{ position: 'absolute', ...style }}
+  >
     {children}
   </div>
 )
@@ -48,7 +65,9 @@ const Crop = ({ src, c, radius }: { src: string; c: CropSpec; radius?: number })
 /* ---------- Мелкие декоративные элементы ---------- */
 
 const Star = ({ x, y }: { x: number; y: number }) => (
-  <Abs style={{ left: x, top: y, width: 16.855, height: 19 }}>
+  <Abs twinkle hit style={{ left: x, top: y, width: 16.855, height: 19 }}>
+    {/* невидимая зона касания побольше самой звезды */}
+    <span style={{ position: 'absolute', inset: -12 }} />
     <Abs style={{ inset: 0, filter: 'blur(4.5px)' }}>
       <Crop src={A('star.png')} c={STAR} />
     </Abs>
@@ -73,14 +92,14 @@ const SparkleImg = ({ blur }: { blur?: boolean }) => (
 
 /** Пара «размытая + резкая» искорка, повёрнутая как в макете. */
 const Sparkle = ({ style, tf }: { style: CSSProperties; tf: string }) => (
-  <>
+  <Abs twinkle style={{ inset: 0, pointerEvents: 'none' }}>
     <Tf style={{ width: 15, height: 11.667, ...style }} tf={tf}>
       <SparkleImg blur />
     </Tf>
     <Tf style={{ width: 15, height: 11.667, ...style }} tf={tf}>
       <SparkleImg />
     </Tf>
-  </>
+  </Abs>
 )
 
 /** Орнамент-«крылья» над подписями. */
@@ -102,29 +121,9 @@ const Wings = ({ style }: { style: CSSProperties }) => (
 
 /* ---------- Коты: покадровая анимация ---------- */
 
-const KISS_IMAGES = ['kiss-1.png', 'kiss-2.png', 'kiss-3.png', 'kiss-4.png', 'heart.png']
-
 function Kiss({ style }: { style: CSSProperties }) {
-  const [ready, setReady] = useState(false)
-
-  // Запускаем цикл только когда все кадры загружены — иначе тайминги съедут.
-  useEffect(() => {
-    let alive = true
-    Promise.all(
-      KISS_IMAGES.map(
-        (n) =>
-          new Promise<void>((res) => {
-            const img = new Image()
-            img.onload = () => res()
-            img.onerror = () => res()
-            img.src = A(n)
-          })
-      )
-    ).then(() => alive && setReady(true))
-    return () => {
-      alive = false
-    }
-  }, [])
+  // Цикл стартует, когда страница открылась (все кадры к этому моменту уже загружены прелоадером).
+  const ready = useContext(RevealCtx)
 
   const frame = { left: 0, top: 0, width: 332, height: 497 }
   return (
@@ -196,6 +195,35 @@ const Sun = () => (
 
 const R = 'rotate(180deg)'
 
+const GOLD = '#d9b259'
+const BASE_BLUE = '#062e6f' // цвет синих поверхностей (замер по макету)
+
+/**
+ * Зерно на синей панели: плитка из макета, обрезанная по форме самой панели (SVG как маска),
+ * поэтому зерно есть только на синем и не попадает на окно с пейзажем.
+ */
+const GrainMask = ({ src }: { src: string }) => {
+  const mask = `url(${A(src)})`
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        backgroundColor: BASE_BLUE,
+        backgroundImage: `url(${A('bg-grain.png')})`,
+        backgroundSize: '200px 150px',
+        WebkitMaskImage: mask,
+        maskImage: mask,
+        WebkitMaskSize: '100% 100%',
+        maskSize: '100% 100%',
+        WebkitMaskRepeat: 'no-repeat',
+        maskRepeat: 'no-repeat',
+      }}
+    />
+  )
+}
+
 function Hero() {
   return (
     <Abs
@@ -220,6 +248,7 @@ function Hero() {
         <Abs style={{ height: 720.086, left: 30.75, top: 140, width: 430 }}>
           <Abs style={{ inset: '-4.17% -6.98%' }}>
             <img alt="" src={A('subtract-a.svg')} style={{ width: '100%', height: '100%' }} />
+            <GrainMask src="subtract-a.svg" />
           </Abs>
         </Abs>
         <Abs style={{ height: 720.086, left: 30.75, top: 130, width: 430 }}>
@@ -272,7 +301,7 @@ function Hero() {
             <img alt="" src={A('line-top.svg')} style={{ width: '100%', height: '100%' }} />
           </Abs>
         </Abs>
-        <Abs style={{ height: 25, left: 'calc(50% + 0.06px)', transform: 'translateX(-50%)', top: 0, width: 24.123 }}>
+        <Abs twinkle style={{ height: 25, left: 'calc(50% + 0.06px)', transform: 'translateX(-50%)', top: 0, width: 24.123 }}>
           <Crop src={A('star-line.png')} c={LINE_STAR} />
         </Abs>
       </Abs>
@@ -299,9 +328,6 @@ const Corners = () => (
 
 /* ---------- Нижняя часть: фон-«чаша» и блок «Детали» ---------- */
 
-const GOLD = '#d9b259'
-const BASE_BLUE = '#062e6f' // цвет фона под блоком «Детали» (замер по макету)
-
 /** Нижняя «обложка» (повёрнута на 180°), в ней только форма — без контента. */
 const COVER_TOP = 1402 // позиция «чаши» не менялась после увеличения кадра
 function Cover() {
@@ -311,6 +337,7 @@ function Cover() {
         <div style={{ position: 'relative', width: 491.502, height: 959 }}>
           <Abs style={{ height: 720.086, left: 30.75, top: 150, width: 430 }}>
             <img alt="" src={A('subtract-c.svg')} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+            <GrainMask src="subtract-c.svg" />
           </Abs>
           <Abs style={{ height: 720.086, left: 30.75, top: 140, width: 430 }}>
             <Abs style={{ inset: '0 -0.12% -0.15% -0.12%' }}>
@@ -354,7 +381,7 @@ const Sep = ({ name, left, top, w }: { name: string; left: number; top: number; 
 )
 
 const Dot = ({ left, color }: { left: number; color: string }) => (
-  <Abs style={{ left, top: 2036, width: 20, height: 20, borderRadius: 10, background: color }} />
+  <Abs style={{ left, top: 2059, width: 20, height: 20, borderRadius: 10, background: color }} />
 )
 
 function Details() {
@@ -373,40 +400,40 @@ function Details() {
         <br />
         Сбор гостей
       </Line>
-      <Line top={1728.7} size={10}>
+      <Line top={1728.7}>
         Phuket Marriott Resort and Spa
         <br />
         Nai Yang Beach
       </Line>
-      <Sep name="sep-1.png" left={172.5} top={1762.5} w={85} />
+      <Sep name="sep-1.png" left={172.5} top={1771.7} w={85} />
 
       {/* 17:00 — Церемония */}
-      <Line top={1781.6}>
+      <Line top={1790.8}>
         <Gold>17:00</Gold>
         <br />
         Церемония
       </Line>
-      <Sep name="sep-2.png" left={188.5} top={1824.5} w={53} />
+      <Sep name="sep-2.png" left={188.5} top={1833.7} w={53} />
 
       {/* 18:00 — Фуршет */}
-      <Line top={1843.6}>
+      <Line top={1852.8}>
         <Gold>18:00</Gold>
         <br />
         Фуршет
       </Line>
-      <Sep name="sep-3.png" left={188.5} top={1886.5} w={53} />
+      <Sep name="sep-3.png" left={188.5} top={1895.7} w={53} />
 
       {/* 19:00 — Начало банкета */}
-      <Line top={1905.6}>
+      <Line top={1914.8}>
         <Gold>19:00</Gold>
         <br />
         Начало банкета
       </Line>
-      <Sep name="sep-4.png" left={172.5} top={1950.5} w={85} />
+      <Sep name="sep-4.png" left={172.5} top={1959.7} w={85} />
 
       {/* Дресс-код */}
-      <Line top={1968}>Дресс-код</Line>
-      <Line top={1993.2} size={10}>
+      <Line top={1977.2}>Дресс-код</Line>
+      <Line top={2002.4}>
         Будем признательны, если
         <br />
         воздержитесь от белого
@@ -434,7 +461,7 @@ const BottomCorners = () => (
 )
 
 const Menu = () => (
-  <Abs style={{ height: 129, left: 82, top: 2091, width: 266 }}>
+  <Abs style={{ height: 129, left: 82, top: 2114, width: 266 }}>
     <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: '50%', top: 35, width: 266, fontSize: 14, textAlign: 'center' }}>
       Предлагаем вам заранее ознакомиться с меню и выбрать то, что вам приглянулось больше!
     </p>
@@ -452,7 +479,7 @@ const Menu = () => (
 /* ---------- Масштаб под ширину экрана ---------- */
 
 const DESIGN_W = 430
-const DESIGN_H = 2505
+const DESIGN_H = 2528
 const getScale = () => Math.min(1, document.documentElement.clientWidth / DESIGN_W)
 
 function useScale() {
@@ -470,22 +497,75 @@ function useScale() {
   return k
 }
 
+type Phase = 'loading' | 'reveal' | 'done'
+
+const canClip =
+  typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('clip-path', 'circle(0px at 50% 50vh)')
+
 export default function App() {
   const k = useScale()
+  const [phase, setPhase] = useState<Phase>('loading')
+  const [open, setOpen] = useState(false)
+  const onReady = useCallback(() => setPhase('reveal'), [])
+
+  // Пока идёт загрузка — страница не прокручивается.
+  useEffect(() => {
+    const root = document.documentElement
+    if (phase === 'done') root.classList.remove('is-loading')
+    else {
+      root.classList.add('is-loading')
+      window.scrollTo(0, 0)
+    }
+    return () => root.classList.remove('is-loading')
+  }, [phase])
+
+  // «Раскрытие окна»: страница растёт кругом из центра экрана.
+  useEffect(() => {
+    if (phase !== 'reveal') return
+    let r2 = 0
+    const r1 = requestAnimationFrame(() => {
+      r2 = requestAnimationFrame(() => setOpen(true))
+    })
+    const t = window.setTimeout(() => setPhase('done'), 1900)
+    return () => {
+      cancelAnimationFrame(r1)
+      cancelAnimationFrame(r2)
+      window.clearTimeout(t)
+    }
+  }, [phase])
+
+  const revealed = phase !== 'loading'
+  useTwinkle(revealed)
+
+  // Стили «окна»: круг из центра экрана (или обычное появление, если clip-path не поддерживается)
+  let wrapStyle: CSSProperties = {}
+  if (phase !== 'done') {
+    const shown = phase === 'reveal' && open
+    wrapStyle = canClip
+      ? { clipPath: shown ? 'circle(160vmax at 50% 50vh)' : 'circle(0px at 50% 50vh)' }
+      : { opacity: shown ? 1 : 0 }
+  }
+
   return (
-    <div className="stage-wrap">
-      <div className="stage-box" style={{ width: DESIGN_W * k, height: DESIGN_H * k }}>
-        <div className="stage" style={{ transform: `scale(${k})`, width: DESIGN_W, height: DESIGN_H }}>
-          <Abs style={{ left: 0, top: 1500, width: 430, height: 1005, background: BASE_BLUE }} />
-          <Hero />
-          <Corners />
-          <Cover />
-          <Grain />
-          <Details />
-          <BottomCorners />
-          <Menu />
+    <RevealCtx.Provider value={revealed}>
+      <div className={`stage-wrap ${phase}`} style={wrapStyle}>
+        <div className="stage-box" style={{ width: DESIGN_W * k, height: DESIGN_H * k }}>
+          <div
+            className={`stage${revealed ? ' go' : ''}`}
+            style={{ transform: `scale(${k})`, width: DESIGN_W, height: DESIGN_H }}
+          >
+            <Abs style={{ left: 0, top: 1500, width: 430, height: DESIGN_H - 1500, background: BASE_BLUE }} />
+            <Hero />
+            <Corners />
+            <Cover />
+            <Grain />
+            <Details />
+            <BottomCorners />
+            <Menu />
+          </div>
         </div>
       </div>
-    </div>
+      {phase !== 'done' && <Preloader onReady={onReady} leaving={phase === 'reveal'} />}
+    </RevealCtx.Provider>
   )
 }
