@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { MENU_URL } from './config'
 
-/* Все координаты — из Figma (кадр 430×2345, node 4084:179). */
+/* Все координаты — из Figma (кадр 430×2505, node 4084:179). */
 
 const A = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`
 
@@ -233,9 +233,9 @@ function Hero() {
 
       {/* Имена */}
       <Abs className="gv" style={{ height: 123, left: 125, top: 218, width: 170 }}>
-        <p style={{ position: 'absolute', transform: 'translateX(-50%)', height: 64, left: 90, top: 59, width: 160, fontSize: 66, letterSpacing: 1.98, color: '#f7f5e5' }}>Алиса</p>
+        <p style={{ position: 'absolute', transform: 'translateX(-50%)', height: 64, left: 90, top: 59, width: 160, fontSize: 66, letterSpacing: 1.98, color: '#f7f5e5', whiteSpace: 'nowrap' }}>Алиса</p>
         <p style={{ position: 'absolute', transform: 'translateX(-50%)', left: 90, top: 56, fontSize: 26, color: '#d9b259', whiteSpace: 'nowrap' }}>&amp;</p>
-        <p style={{ position: 'absolute', transform: 'translateX(-50%)', height: 64, left: 80, top: 0, width: 160, fontSize: 66, letterSpacing: 1.98, color: '#f7f5e5' }}>Денис</p>
+        <p style={{ position: 'absolute', transform: 'translateX(-50%)', left: 85, top: 0, fontSize: 66, letterSpacing: 1.98, color: '#f7f5e5', whiteSpace: 'nowrap' }}>Денис</p>
       </Abs>
 
       <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: '50%', top: 371, width: 214, fontSize: 14, textAlign: 'center' }}>
@@ -297,31 +297,16 @@ const Corners = () => (
   </>
 )
 
-const PfR = ({ style, size, align, children }: { style: CSSProperties; size: number; align?: 'right'; children: ReactNode }) => (
-  <Tf style={style} tf={R}>
-    <p className="pf" style={{ position: 'relative', fontSize: size, textAlign: align, whiteSpace: 'nowrap' }}>{children}</p>
-  </Tf>
-)
+/* ---------- Нижняя часть: фон-«чаша» и блок «Детали» ---------- */
 
-const TimeLabel = ({ time, title, align }: { time: string; title: string; align?: 'right' }) => (
-  <div className="pf" style={{ position: 'relative', fontSize: 14, whiteSpace: 'nowrap', textAlign: align, lineHeight: 0 }}>
-    <p className="gold" style={{ lineHeight: 1.15 }}>{time}</p>
-    <p style={{ lineHeight: 1.15 }}>{title}</p>
-  </div>
-)
+const GOLD = '#d9b259'
+const BASE_BLUE = '#062e6f' // цвет фона под блоком «Детали» (замер по макету)
 
-const Diamond = ({ top }: { top: number }) => (
-  <Tf style={{ height: 24.123, left: '50%', transform: 'translateX(-50%)', top, width: 25 }} tf="rotate(90deg)">
-    <div style={{ position: 'relative', width: 24.123, height: 25 }}>
-      <Crop src={A('star-line.png')} c={LINE_STAR} />
-    </div>
-  </Tf>
-)
-
-function DetailsCover() {
-  const full = 'translateX(-100%)'
+/** Нижняя «обложка» (повёрнута на 180°), в ней только форма — без контента. */
+const COVER_TOP = 1402 // позиция «чаши» не менялась после увеличения кадра
+function Cover() {
   return (
-    <Abs style={{ left: '50%', transform: 'translateX(-50%)', bottom: -16, width: 491.502, height: 959, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <Abs style={{ left: '50%', transform: 'translateX(-50%)', top: COVER_TOP, width: 491.502, height: 959, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ flex: 'none', transform: R }}>
         <div style={{ position: 'relative', width: 491.502, height: 959 }}>
           <Abs style={{ height: 720.086, left: 30.75, top: 150, width: 430 }}>
@@ -332,72 +317,106 @@ function DetailsCover() {
               <img alt="" src={A('subtract-b.svg')} style={{ width: '100%', height: '100%' }} />
             </Abs>
           </Abs>
-
-          {/* блок деталей */}
-          <Abs style={{ height: 262, left: 113, top: 412, width: 268 }}>
-            <Tf style={{ height: 28.609, left: 45.58, top: 64.39, width: 47.418 }} tf={R}>
-              <img alt="" src={A('icon-hanger.png')} width={47.418} height={28.609} />
-            </Tf>
-
-            <Abs style={{ height: 32, left: 173, top: 64, width: 95 }}>
-              <PfR style={{ transform: full, left: 67, top: 16 }} size={14} align="right">Дресс-код</PfR>
-              <PfR style={{ transform: full, left: 95, top: 0 }} size={10} align="right">Текст под дресс-код</PfR>
-            </Abs>
-
-            <Tf style={{ height: 36.824, left: 173.87, top: 132.18, width: 41.133 }} tf={R}>
-              <img alt="" src={A('icon-glasses.png')} width={41.133} height={36.824} />
-            </Tf>
-
-            <Abs style={{ height: 48, left: 0, top: 131, width: 93 }}>
-              <Tf style={{ left: 28, top: 16 }} tf={R}>
-                <TimeLabel time="17:00" title="Праздник" />
-              </Tf>
-              <PfR style={{ left: 0, top: 0 }} size={10}>Текст под праздник</PfR>
-            </Abs>
-
-            <Tf style={{ height: 30.98, right: 175, top: 219.02, width: 53.424 }} tf={R}>
-              <img alt="" src={A('icon-landscape.png')} width={53.424} height={30.98} />
-            </Tf>
-
-            <Abs style={{ height: 48, left: 173, top: 214, width: 76 }}>
-              <Tf style={{ transform: full, left: 76, top: 16 }} tf={R}>
-                <TimeLabel time="15:00" title="Церемония" align="right" />
-              </Tf>
-              <PfR style={{ transform: full, left: 72, top: 0 }} size={10} align="right">Такое то место</PfR>
-            </Abs>
-
-            {/* линия таймлайна */}
-            <Abs style={{ height: 257, left: 119, top: 0, width: 25 }}>
-              <Tf style={{ height: 225, left: 'calc(50% + 1.5px)', transform: 'translateX(-50%)', top: 32, width: 0 }} tf="rotate(-90deg)">
-                <div style={{ position: 'relative', height: 0, width: 225 }}>
-                  <Abs style={{ inset: '-1.96px 0 0.04px 0' }}>
-                    <img alt="" src={A('line-timeline.svg')} style={{ width: '100%', height: '100%' }} />
-                  </Abs>
-                </div>
-              </Tf>
-              <Diamond top={220.88} />
-              <Diamond top={137.88} />
-              <Diamond top={65.88} />
-            </Abs>
-          </Abs>
-
-          {/* заголовок «Детали» */}
-          <Abs style={{ height: 28, left: 185, top: 709, width: 121 }}>
-            <Tf style={{ left: '50%', transform: 'translateX(-50%)', top: 0 }} tf={R}>
-              <p className="pf" style={{ position: 'relative', fontSize: 24, textAlign: 'center', whiteSpace: 'nowrap' }}>Детали</p>
-            </Tf>
-            <Abs style={{ height: 11.667, left: 0, top: 4.33, width: 15 }}>
-              <Sparkle style={{ left: 0, top: 0 }} tf="rotate(90deg) scaleY(-1)" />
-            </Abs>
-            <Tf style={{ height: 11.667, left: 106, top: 4.33, width: 15 }} tf="rotate(180deg) scaleY(-1)">
-              <div style={{ position: 'relative', height: 11.667, width: 15 }}>
-                <Sparkle style={{ left: 0, top: 0 }} tf="rotate(90deg) scaleY(-1)" />
-              </div>
-            </Tf>
-          </Abs>
         </div>
       </div>
     </Abs>
+  )
+}
+
+/** Тонкое зерно фона под блоком «Детали» (плитка 200×150, вырезана из макета). */
+const Grain = () => (
+  <Abs
+    style={{
+      left: 0, top: 1592, width: 430, height: DESIGN_H - 1592,
+      backgroundColor: BASE_BLUE,
+      backgroundImage: `url(${A('bg-grain.png')})`,
+      backgroundSize: '200px 150px',
+      pointerEvents: 'none',
+    }}
+  />
+)
+
+/** Строка по центру кадра (x = 215). `top` — верх строки, как в Figma. */
+const Gold = ({ children }: { children: ReactNode }) => <span style={{ color: GOLD }}>{children}</span>
+
+const Line = ({ top, size = 14, children }: { top: number; size?: number; children: ReactNode }) => (
+  <div
+    className="pf"
+    style={{ position: 'absolute', left: 0, width: DESIGN_W, top, fontSize: size, textAlign: 'center', whiteSpace: 'nowrap' }}
+  >
+    {children}
+  </div>
+)
+
+/** Рукописный золотой разделитель (вырезан из макета, 2x). */
+const Sep = ({ name, left, top, w }: { name: string; left: number; top: number; w: number }) => (
+  <img alt="" src={A(name)} style={{ position: 'absolute', left, top, width: w, height: 5 }} />
+)
+
+const Dot = ({ left, color }: { left: number; color: string }) => (
+  <Abs style={{ left, top: 2036, width: 20, height: 20, borderRadius: 10, background: color }} />
+)
+
+function Details() {
+  return (
+    <>
+      {/* Заголовок «Детали» с искорками */}
+      <Abs style={{ left: 153, top: 1631.8, width: 124, height: 28 }}>
+        <Sparkle style={{ left: 0, top: 4.33 }} tf="rotate(90deg) scaleY(-1)" />
+        <Sparkle style={{ left: 109.5, top: 4.33 }} tf="rotate(90deg) scaleY(-1)" />
+      </Abs>
+      <Line top={1624.3} size={24}>Детали</Line>
+
+      {/* 16:30 — Сбор гостей */}
+      <Line top={1687}>
+        <Gold>16:30</Gold>
+        <br />
+        Сбор гостей
+      </Line>
+      <Line top={1728.7} size={10}>
+        Phuket Marriott Resort and Spa
+        <br />
+        Nai Yang Beach
+      </Line>
+      <Sep name="sep-1.png" left={172.5} top={1762.5} w={85} />
+
+      {/* 17:00 — Церемония */}
+      <Line top={1781.6}>
+        <Gold>17:00</Gold>
+        <br />
+        Церемония
+      </Line>
+      <Sep name="sep-2.png" left={188.5} top={1824.5} w={53} />
+
+      {/* 18:00 — Фуршет */}
+      <Line top={1843.6}>
+        <Gold>18:00</Gold>
+        <br />
+        Фуршет
+      </Line>
+      <Sep name="sep-3.png" left={188.5} top={1886.5} w={53} />
+
+      {/* 19:00 — Начало банкета */}
+      <Line top={1905.6}>
+        <Gold>19:00</Gold>
+        <br />
+        Начало банкета
+      </Line>
+      <Sep name="sep-4.png" left={172.5} top={1950.5} w={85} />
+
+      {/* Дресс-код */}
+      <Line top={1968}>Дресс-код</Line>
+      <Line top={1993.2} size={10}>
+        Будем признательны, если
+        <br />
+        воздержитесь от белого
+        <br />
+        цвета в своих нарядах
+      </Line>
+      <Dot left={169} color="#849532" />
+      <Dot left={204} color="#fff6c1" />
+      <Dot left={239} color="#f4e8cc" />
+    </>
   )
 }
 
@@ -415,7 +434,7 @@ const BottomCorners = () => (
 )
 
 const Menu = () => (
-  <Abs style={{ height: 129, left: 82, top: 1976, width: 266 }}>
+  <Abs style={{ height: 129, left: 82, top: 2091, width: 266 }}>
     <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: '50%', top: 35, width: 266, fontSize: 14, textAlign: 'center' }}>
       Предлагаем вам заранее ознакомиться с меню и выбрать то, что вам приглянулось больше!
     </p>
@@ -433,7 +452,7 @@ const Menu = () => (
 /* ---------- Масштаб под ширину экрана ---------- */
 
 const DESIGN_W = 430
-const DESIGN_H = 2345
+const DESIGN_H = 2505
 const getScale = () => Math.min(1, document.documentElement.clientWidth / DESIGN_W)
 
 function useScale() {
@@ -456,11 +475,13 @@ export default function App() {
   return (
     <div className="stage-wrap">
       <div className="stage-box" style={{ width: DESIGN_W * k, height: DESIGN_H * k }}>
-        <div className="stage" style={{ transform: `scale(${k})` }}>
+        <div className="stage" style={{ transform: `scale(${k})`, width: DESIGN_W, height: DESIGN_H }}>
+          <Abs style={{ left: 0, top: 1500, width: 430, height: 1005, background: BASE_BLUE }} />
           <Hero />
           <Corners />
-          <DetailsCover />
-          <Abs style={{ left: '50%', transform: 'translateX(-50%)', bottom: 0, width: 430, height: 340, background: '#07347e' }} />
+          <Cover />
+          <Grain />
+          <Details />
           <BottomCorners />
           <Menu />
         </div>

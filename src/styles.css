@@ -38,7 +38,7 @@ a.menu-link { text-decoration: none; cursor: pointer; }
 .stage-box { position: relative; }
 .stage {
   position: absolute; left: 0; top: 0;
-  width: 430px; height: 2345px;
+  width: 430px; height: 2505px;
   background: #fff;
   transform-origin: top left;
   overflow: hidden;
