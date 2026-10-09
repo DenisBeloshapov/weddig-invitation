@@ -198,32 +198,6 @@ const R = 'rotate(180deg)'
 const GOLD = '#d9b259'
 const BASE_BLUE = '#062e6f' // цвет синих поверхностей (замер по макету)
 
-/**
- * Зерно на синей панели: плитка из макета, обрезанная по форме самой панели (SVG как маска),
- * поэтому зерно есть только на синем и не попадает на окно с пейзажем.
- */
-const GrainMask = ({ src }: { src: string }) => {
-  const mask = `url(${A(src)})`
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        backgroundColor: BASE_BLUE,
-        backgroundImage: `url(${A('bg-grain.png')})`,
-        backgroundSize: '200px 150px',
-        WebkitMaskImage: mask,
-        maskImage: mask,
-        WebkitMaskSize: '100% 100%',
-        maskSize: '100% 100%',
-        WebkitMaskRepeat: 'no-repeat',
-        maskRepeat: 'no-repeat',
-      }}
-    />
-  )
-}
-
 function Hero() {
   return (
     <Abs
@@ -245,18 +219,14 @@ function Hero() {
         <Abs style={{ height: 338, left: 20.75, top: 774, width: 447 }}>
           <img alt="" src={A('bg-image18.png')} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         </Abs>
-        <Abs style={{ height: 720.086, left: 30.75, top: 140, width: 430 }}>
-          <Abs style={{ inset: '-4.17% -6.98%' }}>
-            <img alt="" src={A('subtract-a.svg')} style={{ width: '100%', height: '100%' }} />
-            <GrainMask src="subtract-a.svg" />
-          </Abs>
-        </Abs>
-        <Abs style={{ height: 720.086, left: 30.75, top: 130, width: 430 }}>
-          <Abs style={{ inset: '0 -0.12% -0.15% -0.12%' }}>
-            <img alt="" src={A('subtract-b.svg')} style={{ width: '100%', height: '100%' }} />
-          </Abs>
-        </Abs>
       </Abs>
+
+      {/* Верхняя обложка: синяя панель с окном-аркой, зерно и обводка запечены в картинку (431×731) */}
+      <img
+        alt=""
+        src={A('cover-top.webp')}
+        style={{ position: 'absolute', left: 0, top: 0, width: 431, height: 731, transform: 'translate(-0.5px, -80.5px)', pointerEvents: 'none' }}
+      />
 
       <Sun />
 
@@ -328,36 +298,18 @@ const Corners = () => (
 
 /* ---------- Нижняя часть: фон-«чаша» и блок «Детали» ---------- */
 
-/** Нижняя «обложка» (повёрнута на 180°), в ней только форма — без контента. */
-const COVER_TOP = 1402 // позиция «чаши» не менялась после увеличения кадра
-function Cover() {
-  return (
-    <Abs style={{ left: '50%', transform: 'translateX(-50%)', top: COVER_TOP, width: 491.502, height: 959, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ flex: 'none', transform: R }}>
-        <div style={{ position: 'relative', width: 491.502, height: 959 }}>
-          <Abs style={{ height: 720.086, left: 30.75, top: 150, width: 430 }}>
-            <img alt="" src={A('subtract-c.svg')} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
-            <GrainMask src="subtract-c.svg" />
-          </Abs>
-          <Abs style={{ height: 720.086, left: 30.75, top: 140, width: 430 }}>
-            <Abs style={{ inset: '0 -0.12% -0.15% -0.12%' }}>
-              <img alt="" src={A('subtract-b.svg')} style={{ width: '100%', height: '100%' }} />
-            </Abs>
-          </Abs>
-        </div>
-      </div>
-    </Abs>
-  )
-}
-
-/** Тонкое зерно фона под блоком «Детали» (плитка 200×150, вырезана из макета). */
-const Grain = () => (
-  <Abs
+/**
+ * Нижняя обложка: синяя панель с окном-аркой сверху, зерно и обводка запечены в картинку.
+ * Картинка обрезана ровно под длину сайта (по высоте кадра), поэтому лишняя часть не загружается.
+ */
+const COVER_BOTTOM_TOP = 1491
+const Cover = () => (
+  <img
+    alt=""
+    src={A('cover-bottom.webp')}
     style={{
-      left: 0, top: 1592, width: 430, height: DESIGN_H - 1592,
-      backgroundColor: BASE_BLUE,
-      backgroundImage: `url(${A('bg-grain.png')})`,
-      backgroundSize: '200px 150px',
+      position: 'absolute', left: 0, top: COVER_BOTTOM_TOP, width: 431, height: 1038, // 2076 px исходника при масштабе 2x
+      transform: 'translateX(-0.5px)',
       pointerEvents: 'none',
     }}
   />
@@ -558,7 +510,6 @@ export default function App() {
             <Hero />
             <Corners />
             <Cover />
-            <Grain />
             <Details />
             <BottomCorners />
             <Menu />

@@ -7,7 +7,7 @@ export const ASSETS = [
   'bg-image18.png', 'field.png', 'sun.png',
   'star.png', 'star-line.png', 'wing-left.png', 'wing-right.png',
   'corner-tl.png', 'corner-tr.png', 'corner-bl.png', 'corner-br.png',
-  'subtract-a.svg', 'subtract-b.svg', 'subtract-c.svg', 'line-top.svg',
+  'cover-top.webp', 'cover-bottom.webp', 'line-top.svg',
   'sep-1.png', 'sep-2.png', 'sep-3.png', 'sep-4.png',
   'bg-grain.png',
 ]
