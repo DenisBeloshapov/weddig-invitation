@@ -5,7 +5,7 @@ import { A } from './assets'
 import Preloader from './Preloader'
 import { useTwinkle } from './twinkle'
 
-/* Все координаты — из Figma (кадр 430×2528 (после увеличения шрифтов в «Детали»), node 4084:179). */
+/* Все координаты — из Figma (кадр 430×2505, node 4084:179). */
 
 /** true, когда прелоадер закончил работу и страница открывается — с этого момента идут анимации. */
 const RevealCtx = createContext(false)
@@ -333,7 +333,7 @@ const Sep = ({ name, left, top, w }: { name: string; left: number; top: number; 
 )
 
 const Dot = ({ left, color }: { left: number; color: string }) => (
-  <Abs style={{ left, top: 2059, width: 20, height: 20, borderRadius: 10, background: color }} />
+  <Abs style={{ left, top: 2072, width: 20, height: 20, borderRadius: 10, background: color }} />
 )
 
 function Details() {
@@ -347,54 +347,68 @@ function Details() {
       <Line top={1624.3} size={24}>Детали</Line>
 
       {/* 16:30 — Сбор гостей */}
-      <Line top={1687}>
+      <Line top={1677.5}>
         <Gold>16:30</Gold>
         <br />
-        Сбор гостей
+        Сбор гостей:
       </Line>
-      <Line top={1728.7}>
+      <Line top={1720}>
         Phuket Marriott Resort and Spa
         <br />
         Nai Yang Beach
       </Line>
-      <Sep name="sep-1.png" left={172.5} top={1771.7} w={85} />
+      <Sep name="sep-1.png" left={172.5} top={1762.5} w={85} />
 
       {/* 17:00 — Церемония */}
-      <Line top={1790.8}>
+      <Line top={1781.6}>
         <Gold>17:00</Gold>
         <br />
         Церемония
       </Line>
-      <Sep name="sep-2.png" left={188.5} top={1833.7} w={53} />
+      <Sep name="sep-2.png" left={188.5} top={1824.5} w={53} />
 
       {/* 18:00 — Фуршет */}
-      <Line top={1852.8}>
+      <Line top={1843.6}>
         <Gold>18:00</Gold>
         <br />
         Фуршет
       </Line>
-      <Sep name="sep-3.png" left={188.5} top={1895.7} w={53} />
+      <Sep name="sep-3.png" left={188.5} top={1886.5} w={53} />
 
       {/* 19:00 — Начало банкета */}
-      <Line top={1914.8}>
+      <Line top={1905.6}>
         <Gold>19:00</Gold>
         <br />
         Начало банкета
       </Line>
-      <Sep name="sep-4.png" left={172.5} top={1959.7} w={85} />
+      <Sep name="sep-4.png" left={188.5} top={1948.5} w={53} />
 
       {/* Дресс-код */}
-      <Line top={1977.2}>Дресс-код</Line>
-      <Line top={2002.4}>
-        Будем признательны, если
-        <br />
-        воздержитесь от белого
-        <br />
-        цвета в своих нарядах
+      <Line top={1968}>
+        <Gold>Дресс-код</Gold>
       </Line>
-      <Dot left={169} color="#849532" />
-      <Dot left={204} color="#fff6c1" />
-      <Dot left={239} color="#f4e8cc" />
+      <Line top={1994}>
+        Мы очень старались сделать праздник
+        <br />
+        красивым, и будем рады, если в своих
+        <br />
+        нарядах вы поддержите цветовую
+        <br />
+        гамму нашей свадьбы:
+      </Line>
+
+      {/* «капсула» с цветами и искорками по бокам */}
+      <Abs style={{ left: 165, top: 2067, width: 100, height: 30, boxSizing: 'border-box', border: `1px solid ${GOLD}`, borderRadius: 15 }} />
+      <Dot left={170} color="#849532" />
+      <Dot left={205} color="#f0ddb2" />
+      <Dot left={240} color="#fff2a8" />
+      <Abs style={{ left: 144, top: 2076.1, width: 15, height: 11.667 }}>
+        <Sparkle style={{ left: 0, top: 0 }} tf="rotate(90deg) scaleY(-1)" />
+      </Abs>
+      <Abs style={{ left: 270.5, top: 2076.1, width: 15, height: 11.667 }}>
+        <Sparkle style={{ left: 0, top: 0 }} tf="rotate(90deg) scaleY(-1)" />
+      </Abs>
+      <Sep name="sep-5.png" left={172.5} top={2109.5} w={85} />
     </>
   )
 }
@@ -413,25 +427,27 @@ const BottomCorners = () => (
 )
 
 const Menu = () => (
-  <Abs style={{ height: 129, left: 82, top: 2114, width: 266 }}>
-    <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: '50%', top: 35, width: 266, fontSize: 14, textAlign: 'center' }}>
+  <>
+    <p
+      className="pf"
+      style={{ position: 'absolute', left: 82, width: 266, top: 2128, fontSize: 14, textAlign: 'center' }}
+    >
       Предлагаем вам заранее ознакомиться с меню и выбрать то, что вам приглянулось больше!
     </p>
-    <Wings style={{ left: 'calc(50% + 0.16px)', transform: 'translateX(-50%)', top: 0 }} />
     <a
       className="pf gold menu-link"
       href={MENU_URL}
-      style={{ position: 'absolute', transform: 'translateX(-50%)', left: 'calc(50% - 0.5px)', top: 113, fontSize: 14, textAlign: 'center', whiteSpace: 'nowrap', color: '#d9b259' }}
+      style={{ position: 'absolute', left: 0, width: DESIGN_W, top: 2184, fontSize: 14, textAlign: 'center', whiteSpace: 'nowrap', color: GOLD }}
     >
       {'{ ОТКРЫТЬ МЕНЮ }'}
     </a>
-  </Abs>
+  </>
 )
 
 /* ---------- Масштаб под ширину экрана ---------- */
 
 const DESIGN_W = 430
-const DESIGN_H = 2528
+const DESIGN_H = 2505
 const getScale = () => Math.min(1, document.documentElement.clientWidth / DESIGN_W)
 
 function useScale() {
