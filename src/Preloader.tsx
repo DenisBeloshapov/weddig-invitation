@@ -4,7 +4,7 @@ import { PRELOADER_MIN_MS } from './config'
 
 const MAX_MS = 15000 // страховка: если что-то не загрузилось, всё равно открываем страницу
 
-type Props = { onReady: () => void; leaving: boolean }
+type Props = { onReady: () => void; leaving: boolean; fade?: boolean }
 
 /** Четырёхконечная звезда — та же форма, что в оформлении приглашения. */
 const STAR_PATH =
@@ -65,7 +65,7 @@ function Emblem() {
   )
 }
 
-export default function Preloader({ onReady, leaving }: Props) {
+export default function Preloader({ onReady, leaving, fade }: Props) {
   const total = ASSETS.length
   const [loaded, setLoaded] = useState(0)
   const [fontsOk, setFontsOk] = useState(false)
@@ -120,7 +120,7 @@ export default function Preloader({ onReady, leaving }: Props) {
   const p = total ? Math.min(1, loaded / total) : 1
 
   return (
-    <div className={`pl${leaving ? ' leaving' : ''}`} role="status" aria-live="polite" aria-label="Загрузка приглашения">
+    <div className={`pl${leaving ? ' leaving' : ''}${fade ? ' fade' : ''}`} role="status" aria-live="polite" aria-label="Загрузка приглашения">
       <div className="pl-glow" />
       <div className="pl-content">
         <Emblem />
