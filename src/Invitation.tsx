@@ -35,7 +35,7 @@ function Kiss({ style }: { style: CSSProperties }) {
       </div>
       {/* Variant3 */}
       <div className="kiss-frame f3" style={frame}>
-        <img alt="" src={A('kiss-3.png')} style={{ position: 'absolute', left: 80, top: 40, width: 252.039, height: 441.998 }} />
+        <img alt="" src={A('kiss-3-figma.png')} style={{ position: 'absolute', left: 80, top: 40, width: 252.039, height: 441.998 }} />
       </div>
       {/* Variant4: поцелуй + сердечко (выходит за верхний край на 12 px) */}
       <div className="kiss-frame f4" style={frame}>

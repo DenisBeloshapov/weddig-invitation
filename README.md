@@ -13,8 +13,7 @@
 Способ без компьютера (GitHub Actions):
 1. Положите в репозиторий обновлённые `scripts/assets-manifest.json`, `scripts/fetch-assets.mjs`
    и файл `.github/workflows/fetch-assets.yml`.
-2. Файлы, у которых в манифесте стоит `null` (сейчас это `kiss-3.png`), экспортируйте из Figma вручную
-   (слой в нужном варианте компонента → Export → PNG, 3x) и загрузите в `public/assets`.
+2. Если в манифесте у файла стоит `null`, его нужно экспортировать из Figma вручную и загрузить в `public/assets`.
 3. GitHub → вкладка **Actions** → **Fetch Figma assets** → **Run workflow**. Картинки скачаются и сами
    закоммитятся в репозиторий, Vercel соберёт сайт заново. Делать это нужно, пока ссылки в манифесте свежие (7 дней).
 
