@@ -9,5 +9,6 @@ export const ASSETS = [
   'corner-tl.png', 'corner-tr.png', 'corner-bl.png', 'corner-br.png',
   'cover-top.webp', 'cover-bottom.webp', 'line-top.svg',
   'sep-1.png', 'sep-2.png', 'sep-3.png', 'sep-4.png', 'sep-5.png',
+  'dresscode-cats.webp',
   'bg-grain.png',
 ]

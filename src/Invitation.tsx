@@ -7,7 +7,7 @@ import type { BoxProps } from './ui'
 import Preloader from './Preloader'
 import { useTwinkle } from './twinkle'
 
-/* Все координаты — из Figma (кадр 430×2550, node 4084:179). */
+/* Все координаты — из Figma (кадр 430×2749, node 4084:179). */
 
 /** true, когда прелоадер закончил работу и страница открывается — с этого момента идут анимации. */
 const RevealCtx = createContext(false)
@@ -229,10 +229,6 @@ const Sep = ({ name, left, top, w }: { name: string; left: number; top: number; 
   <img alt="" src={A(name)} style={{ position: 'absolute', left, top, width: w, height: 5 }} />
 )
 
-const Dot = ({ left, color }: { left: number; color: string }) => (
-  <Abs style={{ left, top: 2107.6, width: 20, height: 20, borderRadius: 10, background: color }} />
-)
-
 function Details() {
   return (
     <>
@@ -294,18 +290,13 @@ function Details() {
         гамму нашей свадьбы:
       </Line>
 
-      {/* «капсула» с цветами и искорками по бокам */}
-      <Abs style={{ left: 165, top: 2102.6, width: 100, height: 30, boxSizing: 'border-box', border: `1px solid ${GOLD}`, borderRadius: 15 }} />
-      <Dot left={170} color="#849532" />
-      <Dot left={205} color="#f0ddb2" />
-      <Dot left={240} color="#fff2a8" />
-      <Abs style={{ left: 144, top: 2111.7, width: 15, height: 11.667 }}>
-        <Sparkle style={{ left: 0, top: 0 }} tf="rotate(90deg) scaleY(-1)" />
-      </Abs>
-      <Abs style={{ left: 270.5, top: 2111.7, width: 15, height: 11.667 }}>
-        <Sparkle style={{ left: 0, top: 0 }} tf="rotate(90deg) scaleY(-1)" />
-      </Abs>
-      <Sep name="sep-5.png" left={172.5} top={2145.1} w={85} />
+      {/* коты в нарядах цветовой гаммы (вместо цветных кружков); исходник 883×612 px, показан шириной 337 */}
+      <img
+        alt="Коты в нарядах цветовой гаммы свадьбы"
+        src={A('dresscode-cats.webp')}
+        style={{ position: 'absolute', left: 46.5, top: 2097.7, width: 337, height: 233.6, pointerEvents: 'none' }}
+      />
+      <Sep name="sep-5.png" left={172.5} top={2339.2} w={85} />
     </>
   )
 }
@@ -327,7 +318,7 @@ const Menu = () => (
   <>
     <p
       className="pf"
-      style={{ position: 'absolute', left: 60, width: 310, top: 2163.6, fontSize: 16, textAlign: 'center', whiteSpace: 'nowrap' }}
+      style={{ position: 'absolute', left: 60, width: 310, top: 2360.7, fontSize: 16, textAlign: 'center', whiteSpace: 'nowrap' }}
     >
       Предлагаем вам заранее ознакомиться
       <br />
@@ -338,7 +329,7 @@ const Menu = () => (
     <a
       className="pf gold menu-link"
       href={MENU_URL}
-      style={{ position: 'absolute', left: 0, width: DESIGN_W, top: 2226.5, fontSize: 16, textAlign: 'center', whiteSpace: 'nowrap', color: GOLD }}
+      style={{ position: 'absolute', left: 0, width: DESIGN_W, top: 2424.7, fontSize: 16, textAlign: 'center', whiteSpace: 'nowrap', color: GOLD }}
     >
       {'{ ОТКРЫТЬ МЕНЮ }'}
     </a>
@@ -348,7 +339,7 @@ const Menu = () => (
 /* ---------- Масштаб под ширину экрана ---------- */
 
 const DESIGN_W = 430
-const DESIGN_H = 2550
+const DESIGN_H = 2749
 const getScale = () => Math.min(1, document.documentElement.clientWidth / DESIGN_W)
 
 function useScale() {
@@ -432,7 +423,12 @@ export default function Invitation({ visible = true, menuRoute = false }: Invita
             className={`stage${revealed ? ' go' : ''}`}
             style={{ transform: `scale(${k})`, width: DESIGN_W, height: DESIGN_H }}
           >
-            <Abs style={{ left: 0, top: 1500, width: 430, height: DESIGN_H - 1500, background: BASE_BLUE }} />
+            <Abs
+              style={{
+                left: 0, top: 1500, width: 430, height: DESIGN_H - 1500,
+                backgroundColor: BASE_BLUE, backgroundImage: `url(${A('bg-grain.png')})`, backgroundSize: '200px 150px',
+              }}
+            />
             <Hero />
             <Corners />
             <Cover />
