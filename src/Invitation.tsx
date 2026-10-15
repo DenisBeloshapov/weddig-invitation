@@ -7,7 +7,7 @@ import type { BoxProps } from './ui'
 import Preloader from './Preloader'
 import { useTwinkle } from './twinkle'
 
-/* Все координаты — из Figma (кадр 430×2505, node 4084:179). */
+/* Все координаты — из Figma (кадр 430×2550, node 4084:179). */
 
 /** true, когда прелоадер закончил работу и страница открывается — с этого момента идут анимации. */
 const RevealCtx = createContext(false)
@@ -130,10 +130,14 @@ function Hero() {
         <p style={{ position: 'absolute', transform: 'translateX(-50%)', left: 85, top: 0, fontSize: 66, letterSpacing: 1.98, color: '#f7f5e5', whiteSpace: 'nowrap' }}>Денис</p>
       </Abs>
 
-      <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: '50%', top: 371, width: 214, fontSize: 14, textAlign: 'center' }}>
-        Приглашаем вас разделить с нами самый важный день в нашей жизни
+      <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: '50%', top: 371, width: 250, fontSize: 16, textAlign: 'center', whiteSpace: 'nowrap' }}>
+        Приглашаем вас разделить с
+        <br />
+        нами самый важный день в
+        <br />
+        нашей жизни
       </p>
-      <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: 'calc(50% - 1px)', top: 464, fontSize: 26, textAlign: 'center', whiteSpace: 'nowrap' }}>
+      <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: 'calc(50% - 1px)', top: 470.9, fontSize: 28, textAlign: 'center', whiteSpace: 'nowrap' }}>
         05.01.2027
       </p>
 
@@ -149,16 +153,16 @@ function Hero() {
 
       {/* «Мы женимся!» */}
       <Abs style={{ height: 27.578, left: 123.51, top: 161, width: 183.473 }}>
-        <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: 'calc(50% + 0.26px)', top: 5, fontSize: 14, textAlign: 'center', whiteSpace: 'nowrap' }}>
+        <p className="pf" style={{ position: 'absolute', transform: 'translateX(-50%)', left: 'calc(50% + 0.26px)', top: 3.9, fontSize: 16, textAlign: 'center', whiteSpace: 'nowrap' }}>
           Мы женимся!
         </p>
-        <Sparkle style={{ left: 30.16, top: 8.32 }} tf="rotate(-90deg)" />
-        <Sparkle style={{ left: 138.49, top: 7.65 }} tf="rotate(-90deg) scaleY(-1)" />
+        <Sparkle style={{ left: 22.16, top: 8.32 }} tf="rotate(-90deg)" />
+        <Sparkle style={{ left: 146.49, top: 7.65 }} tf="rotate(-90deg) scaleY(-1)" />
         <Wings style={{ left: 'calc(50% - 0.08px)', transform: 'translateX(-50%)', top: -24 }} />
       </Abs>
 
       {/* линия со звездой */}
-      <Abs style={{ height: 25, left: 140, top: 429, width: 150 }}>
+      <Abs style={{ height: 25, left: 140, top: 435.9, width: 150 }}>
         <Abs style={{ height: 0, left: '50%', transform: 'translateX(-50%)', top: 12, width: 150 }}>
           <Abs style={{ inset: '-0.96px 0' }}>
             <img alt="" src={A('line-top.svg')} style={{ width: '100%', height: '100%' }} />
@@ -201,7 +205,7 @@ const Cover = () => (
     alt=""
     src={A('cover-bottom.webp')}
     style={{
-      position: 'absolute', left: 0, top: COVER_BOTTOM_TOP, width: 431, height: 1038, // 2076 px исходника при масштабе 2x
+      position: 'absolute', left: 0, top: COVER_BOTTOM_TOP, width: 431, height: 1189, // 2378 px исходника при масштабе 2x (с запасом: лишнее скрывает холст)
       transform: 'translateX(-0.5px)',
       pointerEvents: 'none',
     }}
@@ -211,7 +215,7 @@ const Cover = () => (
 /** Строка по центру кадра (x = 215). `top` — верх строки, как в Figma. */
 const Gold = ({ children }: { children: ReactNode }) => <span style={{ color: GOLD }}>{children}</span>
 
-const Line = ({ top, size = 14, children }: { top: number; size?: number; children: ReactNode }) => (
+const Line = ({ top, size = 16, children }: { top: number; size?: number; children: ReactNode }) => (
   <div
     className="pf"
     style={{ position: 'absolute', left: 0, width: DESIGN_W, top, fontSize: size, textAlign: 'center', whiteSpace: 'nowrap' }}
@@ -226,7 +230,7 @@ const Sep = ({ name, left, top, w }: { name: string; left: number; top: number; 
 )
 
 const Dot = ({ left, color }: { left: number; color: string }) => (
-  <Abs style={{ left, top: 2072, width: 20, height: 20, borderRadius: 10, background: color }} />
+  <Abs style={{ left, top: 2107.6, width: 20, height: 20, borderRadius: 10, background: color }} />
 )
 
 function Details() {
@@ -234,53 +238,53 @@ function Details() {
     <>
       {/* Заголовок «Детали» с искорками */}
       <Abs style={{ left: 153, top: 1631.8, width: 124, height: 28 }}>
-        <Sparkle style={{ left: 0, top: 4.33 }} tf="rotate(90deg) scaleY(-1)" />
-        <Sparkle style={{ left: 109.5, top: 4.33 }} tf="rotate(90deg) scaleY(-1)" />
+        <Sparkle style={{ left: -3, top: 4.33 }} tf="rotate(90deg) scaleY(-1)" />
+        <Sparkle style={{ left: 112.5, top: 4.33 }} tf="rotate(90deg) scaleY(-1)" />
       </Abs>
-      <Line top={1624.3} size={24}>Детали</Line>
+      <Line top={1623.1} size={26}>Детали</Line>
 
       {/* 16:30 — Сбор гостей */}
-      <Line top={1677.5}>
+      <Line top={1678.7}>
         <Gold>16:30</Gold>
         <br />
         Сбор гостей:
       </Line>
-      <Line top={1720}>
+      <Line top={1725.8}>
         Phuket Marriott Resort and Spa
         <br />
         Nai Yang Beach
       </Line>
-      <Sep name="sep-1.png" left={172.5} top={1762.5} w={85} />
+      <Sep name="sep-1.png" left={172.5} top={1772.8} w={85} />
 
       {/* 17:00 — Церемония */}
-      <Line top={1781.6}>
+      <Line top={1791.9}>
         <Gold>17:00</Gold>
         <br />
         Церемония
       </Line>
-      <Sep name="sep-2.png" left={188.5} top={1824.5} w={53} />
+      <Sep name="sep-2.png" left={188.5} top={1839.4} w={53} />
 
       {/* 18:00 — Фуршет */}
-      <Line top={1843.6}>
+      <Line top={1858.5}>
         <Gold>18:00</Gold>
         <br />
         Фуршет
       </Line>
-      <Sep name="sep-3.png" left={188.5} top={1886.5} w={53} />
+      <Sep name="sep-3.png" left={188.5} top={1906} w={53} />
 
       {/* 19:00 — Начало банкета */}
-      <Line top={1905.6}>
+      <Line top={1925.1}>
         <Gold>19:00</Gold>
         <br />
         Начало банкета
       </Line>
-      <Sep name="sep-4.png" left={188.5} top={1948.5} w={53} />
+      <Sep name="sep-4.png" left={188.5} top={1972.6} w={53} />
 
       {/* Дресс-код */}
-      <Line top={1968}>
+      <Line top={1992.1}>
         <Gold>Дресс-код</Gold>
       </Line>
-      <Line top={1994}>
+      <Line top={2020.4}>
         Мы очень старались сделать праздник
         <br />
         красивым, и будем рады, если в своих
@@ -291,17 +295,17 @@ function Details() {
       </Line>
 
       {/* «капсула» с цветами и искорками по бокам */}
-      <Abs style={{ left: 165, top: 2067, width: 100, height: 30, boxSizing: 'border-box', border: `1px solid ${GOLD}`, borderRadius: 15 }} />
+      <Abs style={{ left: 165, top: 2102.6, width: 100, height: 30, boxSizing: 'border-box', border: `1px solid ${GOLD}`, borderRadius: 15 }} />
       <Dot left={170} color="#849532" />
       <Dot left={205} color="#f0ddb2" />
       <Dot left={240} color="#fff2a8" />
-      <Abs style={{ left: 144, top: 2076.1, width: 15, height: 11.667 }}>
+      <Abs style={{ left: 144, top: 2111.7, width: 15, height: 11.667 }}>
         <Sparkle style={{ left: 0, top: 0 }} tf="rotate(90deg) scaleY(-1)" />
       </Abs>
-      <Abs style={{ left: 270.5, top: 2076.1, width: 15, height: 11.667 }}>
+      <Abs style={{ left: 270.5, top: 2111.7, width: 15, height: 11.667 }}>
         <Sparkle style={{ left: 0, top: 0 }} tf="rotate(90deg) scaleY(-1)" />
       </Abs>
-      <Sep name="sep-5.png" left={172.5} top={2109.5} w={85} />
+      <Sep name="sep-5.png" left={172.5} top={2145.1} w={85} />
     </>
   )
 }
@@ -323,14 +327,18 @@ const Menu = () => (
   <>
     <p
       className="pf"
-      style={{ position: 'absolute', left: 82, width: 266, top: 2128, fontSize: 14, textAlign: 'center' }}
+      style={{ position: 'absolute', left: 60, width: 310, top: 2163.6, fontSize: 16, textAlign: 'center', whiteSpace: 'nowrap' }}
     >
-      Предлагаем вам заранее ознакомиться с меню и выбрать то, что вам приглянулось больше!
+      Предлагаем вам заранее ознакомиться
+      <br />
+      с меню и выбрать то, что вам
+      <br />
+      приглянулось больше!
     </p>
     <a
       className="pf gold menu-link"
       href={MENU_URL}
-      style={{ position: 'absolute', left: 0, width: DESIGN_W, top: 2184, fontSize: 14, textAlign: 'center', whiteSpace: 'nowrap', color: GOLD }}
+      style={{ position: 'absolute', left: 0, width: DESIGN_W, top: 2226.5, fontSize: 16, textAlign: 'center', whiteSpace: 'nowrap', color: GOLD }}
     >
       {'{ ОТКРЫТЬ МЕНЮ }'}
     </a>
@@ -340,7 +348,7 @@ const Menu = () => (
 /* ---------- Масштаб под ширину экрана ---------- */
 
 const DESIGN_W = 430
-const DESIGN_H = 2505
+const DESIGN_H = 2550
 const getScale = () => Math.min(1, document.documentElement.clientWidth / DESIGN_W)
 
 function useScale() {
