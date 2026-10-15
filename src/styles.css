@@ -341,3 +341,20 @@ html.is-loading, html.is-loading body { overflow: hidden; height: 100%; }
   .mp-reveal { opacity: 1; transform: none; transition: none; }
   .mp-card, .mp-sec, .mp-done { animation: none; }
 }
+
+/* ---------- Кнопка «Открыть меню» в приглашении (тот же стиль, что у «Отправить выбор») ---------- */
+.inv-btn {
+  position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center;
+  padding: 16px 40px; border: 1px solid #d9b259; border-radius: 999px; text-decoration: none; white-space: nowrap;
+  background: linear-gradient(180deg, #f6dd98, #d9b259 55%, #bf9440); color: #062e6f;
+  font-family: 'Playfair Display', serif; font-size: 15px; line-height: 1.15; letter-spacing: 0.14em; text-transform: uppercase;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 26px rgba(217, 178, 89, 0.3);
+  transition: transform 0.25s, box-shadow 0.3s;
+}
+.inv-btn::after {
+  content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.55) 50%, transparent 65%);
+  transform: translateX(-120%); animation: mp-shine 4.2s ease-in-out infinite;
+}
+.inv-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35), 0 0 34px rgba(217, 178, 89, 0.45); }
+.inv-btn:focus-visible { outline: 2px solid #f3d98f; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .inv-btn::after { animation: none; } }

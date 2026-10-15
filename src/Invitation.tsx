@@ -326,13 +326,12 @@ const Menu = () => (
       <br />
       приглянулось больше!
     </p>
-    <a
-      className="pf gold menu-link"
-      href={MENU_URL}
-      style={{ position: 'absolute', left: 0, width: DESIGN_W, top: 2424.7, fontSize: 16, textAlign: 'center', whiteSpace: 'nowrap', color: GOLD }}
-    >
-      {'{ ОТКРЫТЬ МЕНЮ }'}
-    </a>
+    {/* кнопка в стиле «Отправить выбор» со страницы меню */}
+    <div style={{ position: 'absolute', left: 0, width: DESIGN_W, top: 2436, display: 'flex', justifyContent: 'center' }}>
+      <a className="inv-btn" href={MENU_URL}>
+        Открыть меню
+      </a>
+    </div>
   </>
 )
 
