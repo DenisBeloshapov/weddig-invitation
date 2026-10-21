@@ -4,7 +4,7 @@ import { A } from './assets'
 import { Wings } from './ui'
 import { MENU_SETS, CUISINES, setsOf, getSet, setLabel, mainChoices } from './menuData'
 import type { Cuisine, MenuSet } from './menuData'
-import { submitChoices } from './api'
+import { submitChoices, DEMO_MODE } from './api'
 import type { ChoicePayload } from './api'
 
 /* ------------------------------------------------------------------ */
@@ -123,12 +123,21 @@ function MenuCard({ set, onChoose }: { set: MenuSet; onChoose: (id: string) => v
 
 type Entry = { id: string; forSelf: boolean; guest: string; setId: string; main: string }
 type Draft = { submittedBy: string; entries: Entry[] }
-type Saved = { draft: Draft; submitted?: ChoicePayload }
+type Saved = { draft: Draft; submitted?: ChoicePayload; submissionId?: string; demo?: boolean }
 
 const STORAGE_KEY = 'wedding-menu-v1'
 const MAX_ENTRIES = 10
 
 const uid = () => Math.random().toString(36).slice(2, 9)
+/** Постоянный номер заявки для этого браузера (чтобы повторная отправка заменяла, а не дублировала строки). */
+const newSubmissionId = () => {
+  try {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID()
+  } catch {
+    /* ignore */
+  }
+  return `${Date.now().toString(36)}-${uid()}${uid()}`
+}
 const newEntry = (forSelf: boolean): Entry => ({ id: uid(), forSelf, guest: '', setId: '', main: '' })
 const emptyDraft = (): Draft => ({ submittedBy: '', entries: [newEntry(true)] })
 
@@ -137,12 +146,20 @@ function loadSaved(): Saved {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const s = JSON.parse(raw) as Saved
-      if (s?.draft && Array.isArray(s.draft.entries) && s.draft.entries.length) return s
+      if (s?.draft && Array.isArray(s.draft.entries) && s.draft.entries.length) {
+        const out: Saved = { ...s, submissionId: s.submissionId || newSubmissionId() }
+        // ответ, «отправленный» в тестовом режиме, никуда не уходил: когда таблица подключена, просим отправить заново
+        if (out.submitted && out.demo && !DEMO_MODE) {
+          delete out.submitted
+          delete out.demo
+        }
+        return out
+      }
     }
   } catch {
     /* хранилище недоступно — работаем без него */
   }
-  return { draft: emptyDraft() }
+  return { draft: emptyDraft(), submissionId: newSubmissionId() }
 }
 
 function persist(s: Saved) {
@@ -182,9 +199,10 @@ function validate(d: Draft): Errors {
   return out
 }
 
-function buildPayload(d: Draft): ChoicePayload {
+function buildPayload(d: Draft, submissionId: string): ChoicePayload {
   const by = d.submittedBy.trim()
   return {
+    submissionId,
     submittedBy: by,
     submittedAt: new Date().toISOString(),
     choices: d.entries.map((e) => {
@@ -194,6 +212,8 @@ function buildPayload(d: Draft): ChoicePayload {
         forSelf: e.forSelf,
         setId: set.id,
         setLabel: setLabel(set),
+        cuisine: set.cuisine,
+        menu: set.letter,
         main: mainChoices(set).length ? e.main : '',
       }
     }),
@@ -430,10 +450,12 @@ export default function MenuPage() {
     }
     setStatus('sending')
     try {
-      const payload = buildPayload(draft)
+      const submissionId = saved.submissionId || newSubmissionId()
+      const payload = buildPayload(draft, submissionId)
       await submitChoices(payload)
       setSubmitted(payload)
-      persist({ draft, submitted: payload })
+      persist({ draft, submitted: payload, submissionId, demo: DEMO_MODE })
+      setSaved((x) => ({ ...x, submitted: payload, submissionId, demo: DEMO_MODE }))
       setStatus('idle')
       window.setTimeout(() => scrollTo(formRef.current), 60)
     } catch {
@@ -530,6 +552,7 @@ export default function MenuPage() {
               <Star4 size={22} />
               <p className="mp-done-title">Спасибо, {submitted.submittedBy}!</p>
               <p className="mp-lead">Ваш выбор принят.</p>
+              {DEMO_MODE && <p className="mp-info">Тестовый режим: ответ пока никуда не отправляется.</p>}
               <ul className="mp-summary">
                 {submitted.choices.map((c, i) => (
                   <li key={i}>
