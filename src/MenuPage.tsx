@@ -2,8 +2,8 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import type { CSSProperties, ReactNode } from 'react'
 import { A } from './assets'
 import { Wings } from './ui'
-import { MENU_SETS, CUISINES, setsOf, getSet, setLabel, mainChoices } from './menuData'
-import type { Cuisine, MenuSet } from './menuData'
+import { MENU_SET, setLabel, mainChoices } from './menuData'
+import type { MenuSet } from './menuData'
 import { submitChoices, DEMO_MODE } from './api'
 import type { ChoicePayload } from './api'
 
@@ -76,7 +76,7 @@ function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; 
 /* Просмотр меню                                                       */
 /* ------------------------------------------------------------------ */
 
-function MenuCard({ set, onChoose }: { set: MenuSet; onChoose: (id: string) => void }) {
+function MenuCard({ set, onGo }: { set: MenuSet; onGo: () => void }) {
   return (
     <article className="mp-card" aria-label={setLabel(set)}>
       <div className="mp-card-head">
@@ -110,8 +110,8 @@ function MenuCard({ set, onChoose }: { set: MenuSet; onChoose: (id: string) => v
           {i < set.sections.length - 1 && <Sep wide={i % 2 === 1} />}
         </Fragment>
       ))}
-      <button type="button" className="mp-btn ghost" onClick={() => onChoose(set.id)}>
-        Выбрать этот сет
+      <button type="button" className="mp-btn ghost" onClick={onGo}>
+        Выбрать основное блюдо
       </button>
     </article>
   )
@@ -138,7 +138,7 @@ const newSubmissionId = () => {
   }
   return `${Date.now().toString(36)}-${uid()}${uid()}`
 }
-const newEntry = (forSelf: boolean): Entry => ({ id: uid(), forSelf, guest: '', setId: '', main: '' })
+const newEntry = (forSelf: boolean): Entry => ({ id: uid(), forSelf, guest: '', setId: MENU_SET.id, main: '' })
 const emptyDraft = (): Draft => ({ submittedBy: '', entries: [newEntry(true)] })
 
 function loadSaved(): Saved {
@@ -148,6 +148,12 @@ function loadSaved(): Saved {
       const s = JSON.parse(raw) as Saved
       if (s?.draft && Array.isArray(s.draft.entries) && s.draft.entries.length) {
         const out: Saved = { ...s, submissionId: s.submissionId || newSubmissionId() }
+        // сет теперь один: старые черновики приводим к нему, прежний выбор блюда оставляем, только если оно есть в меню
+        const validMains = mainChoices(MENU_SET).map((x) => x.name)
+        out.draft = {
+          ...s.draft,
+          entries: s.draft.entries.map((e) => ({ ...e, setId: MENU_SET.id, main: validMains.includes(e.main) ? e.main : '' })),
+        }
         // ответ, «отправленный» в тестовом режиме, никуда не уходил: когда таблица подключена, просим отправить заново
         if (out.submitted && out.demo && !DEMO_MODE) {
           delete out.submitted
@@ -188,9 +194,7 @@ function validate(d: Draft): Errors {
       if (selfSeen) er.self = 'Выбор для себя уже добавлен — для другого человека выберите «Для другого гостя»'
       selfSeen = true
     } else if (!nameOk(e.guest)) er.guest = 'Введите ФИО гостя'
-    const set = getSet(e.setId)
-    if (!set) er.set = 'Выберите сет'
-    else if (mainChoices(set).length && !e.main) er.main = 'Выберите основное блюдо'
+    if (!e.main) er.main = 'Выберите основное блюдо'
     if (Object.keys(er).length) {
       out.entries[e.id] = er
       out.count += Object.keys(er).length
@@ -206,7 +210,7 @@ function buildPayload(d: Draft, submissionId: string): ChoicePayload {
     submittedBy: by,
     submittedAt: new Date().toISOString(),
     choices: d.entries.map((e) => {
-      const set = getSet(e.setId)!
+      const set = MENU_SET
       return {
         forName: e.forSelf ? by : e.guest.trim(),
         forSelf: e.forSelf,
@@ -214,7 +218,7 @@ function buildPayload(d: Draft, submissionId: string): ChoicePayload {
         setLabel: setLabel(set),
         cuisine: set.cuisine,
         menu: set.letter,
-        main: mainChoices(set).length ? e.main : '',
+        main: e.main,
       }
     }),
   }
@@ -225,7 +229,6 @@ type FormProps = {
   setDraft: (fn: (d: Draft) => Draft) => void
   showErrors: boolean
   errors: Errors
-  onPreview: (setId: string) => void
 }
 
 function EntryCard({
@@ -236,7 +239,6 @@ function EntryCard({
   showErrors,
   patch,
   onRemove,
-  onPreview,
 }: {
   entry: Entry
   index: number
@@ -245,11 +247,8 @@ function EntryCard({
   showErrors: boolean
   patch: (p: Partial<Entry>) => void
   onRemove: () => void
-  onPreview: (setId: string) => void
 }) {
-  const set = getSet(entry.setId)
-  const mains = set ? mainChoices(set) : []
-  const family = set?.sections.some((s) => !s.either && s.title.includes('Family Style'))
+  const mains = mainChoices(MENU_SET)
 
   return (
     <fieldset className="mp-entry" aria-label={`Выбор №${index + 1}`}>
@@ -287,43 +286,7 @@ function EntryCard({
         </div>
       )}
 
-      <p className="mp-label">Сет</p>
-      <div className="mp-sets" role="radiogroup" aria-label="Выберите сет">
-        {CUISINES.map((c) => (
-          <div className="mp-group" key={c}>
-            <p className="mp-group-title">{c}</p>
-            <div className="mp-pills">
-              {setsOf(c).map((s) => {
-                const on = entry.setId === s.id
-                return (
-                  <label key={s.id} className={`mp-pill${on ? ' on' : ''}`}>
-                    <input
-                      type="radio"
-                      name={`set-${entry.id}`}
-                      value={s.id}
-                      checked={on}
-                      onChange={() => patch({ setId: s.id, main: '' })}
-                    />
-                    <span>Menu {s.letter}</span>
-                  </label>
-                )
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-      {showErrors && err.set && <p className="mp-err" data-err>{err.set}</p>}
-
-      {set && (
-        <p className="mp-picked">
-          <Star4 size={11} /> {setLabel(set)}
-          <button type="button" className="mp-link" onClick={() => onPreview(set.id)}>
-            посмотреть меню
-          </button>
-        </p>
-      )}
-
-      {set && mains.length > 0 && (
+      {mains.length > 0 && (
         <div className="mp-main" role="radiogroup" aria-label="Основное блюдо">
           <p className="mp-label">Основное блюдо</p>
           {mains.map((d) => (
@@ -336,12 +299,11 @@ function EntryCard({
           {showErrors && err.main && <p className="mp-err" data-err>{err.main}</p>}
         </div>
       )}
-      {family && <p className="mp-info">Основные блюда подаются на стол для всех (Family Style) — выбирать отдельное блюдо не нужно.</p>}
     </fieldset>
   )
 }
 
-function ChoiceForm({ draft, setDraft, showErrors, errors, onPreview }: FormProps) {
+function ChoiceForm({ draft, setDraft, showErrors, errors }: FormProps) {
   const patchEntry = (id: string, p: Partial<Entry>) =>
     setDraft((d) => ({ ...d, entries: d.entries.map((e) => (e.id === id ? { ...e, ...p } : e)) }))
 
@@ -371,7 +333,6 @@ function ChoiceForm({ draft, setDraft, showErrors, errors, onPreview }: FormProp
           showErrors={showErrors}
           patch={(p) => patchEntry(e.id, p)}
           onRemove={() => setDraft((d) => ({ ...d, entries: d.entries.filter((x) => x.id !== e.id) }))}
-          onPreview={onPreview}
         />
       ))}
 
@@ -393,14 +354,12 @@ function ChoiceForm({ draft, setDraft, showErrors, errors, onPreview }: FormProp
 /* ------------------------------------------------------------------ */
 
 export default function MenuPage() {
-  const [viewId, setViewId] = useState(MENU_SETS[0].id)
-  const view = getSet(viewId)!
+  const view = MENU_SET
   const [saved, setSaved] = useState<Saved>(loadSaved)
   const [showErrors, setShowErrors] = useState(false)
   const [status, setStatus] = useState<'idle' | 'sending' | 'error'>('idle')
   const [submitted, setSubmitted] = useState<ChoicePayload | undefined>(saved.submitted)
   const formRef = useRef<HTMLElement>(null)
-  const cardRef = useRef<HTMLDivElement>(null)
 
   const draft = saved.draft
   const setDraft = useCallback((fn: (d: Draft) => Draft) => {
@@ -424,19 +383,10 @@ export default function MenuPage() {
 
   const scrollTo = (el: HTMLElement | null) => el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
-  /** «Выбрать этот сет»: подставляем в первый выбор без сета и прокручиваем к форме. */
-  const chooseSet = (id: string) => {
+  /** «Выбрать основное блюдо»: прокручиваем к форме. */
+  const goToForm = () => {
     setSubmitted(undefined)
-    setDraft((d) => {
-      const idx = Math.max(0, d.entries.findIndex((e) => !e.setId))
-      return { ...d, entries: d.entries.map((e, i) => (i === idx ? { ...e, setId: id, main: '' } : e)) }
-    })
     window.setTimeout(() => scrollTo(formRef.current), 60)
-  }
-
-  const preview = (id: string) => {
-    setViewId(id)
-    window.setTimeout(() => scrollTo(cardRef.current), 60)
   }
 
   const onSubmit = async () => {
@@ -462,8 +412,6 @@ export default function MenuPage() {
       setStatus('error')
     }
   }
-
-  const cuisineIdx = CUISINES.indexOf(view.cuisine)
 
   return (
     <main className="mp">
@@ -501,43 +449,8 @@ export default function MenuPage() {
         </div>
       </header>
 
-      {/* выбор сета для просмотра */}
-      <Reveal>
-        <div className="mp-view">
-          <div className="mp-seg" role="tablist" aria-label="Кухня">
-            <span className="mp-seg-ind" style={{ transform: `translateX(${cuisineIdx * 100}%)` }} />
-            {CUISINES.map((c: Cuisine) => (
-              <button
-                key={c}
-                type="button"
-                role="tab"
-                aria-selected={view.cuisine === c}
-                className={view.cuisine === c ? 'on' : ''}
-                onClick={() => setViewId(setsOf(c)[0].id)}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-          <div className="mp-letters" role="tablist" aria-label="Сет">
-            {setsOf(view.cuisine).map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                role="tab"
-                aria-selected={viewId === s.id}
-                className={viewId === s.id ? 'on' : ''}
-                onClick={() => setViewId(s.id)}
-              >
-                Menu {s.letter}
-              </button>
-            ))}
-          </div>
-        </div>
-      </Reveal>
-
-      <div ref={cardRef} className="mp-card-wrap">
-        <MenuCard key={view.id} set={view} onChoose={chooseSet} />
+      <div className="mp-card-wrap">
+        <MenuCard set={view} onGo={goToForm} />
       </div>
 
       {/* форма */}
@@ -568,8 +481,8 @@ export default function MenuPage() {
             </div>
           ) : (
             <>
-              <p className="mp-lead">Укажите ваше ФИО и выберите сет. Если вы выбираете за другого человека, добавьте его ниже.</p>
-              <ChoiceForm draft={draft} setDraft={setDraft} showErrors={showErrors} errors={errors} onPreview={preview} />
+              <p className="mp-lead">Укажите ваше ФИО и выберите основное блюдо. Если вы выбираете за другого человека, добавьте его ниже.</p>
+              <ChoiceForm draft={draft} setDraft={setDraft} showErrors={showErrors} errors={errors} />
               {showErrors && errors.count > 0 && <p className="mp-err center" data-err>Проверьте, пожалуйста, отмеченные поля.</p>}
               {status === 'error' && (
                 <p className="mp-err center" data-err>Не получилось отправить выбор. Проверьте интернет и попробуйте ещё раз.</p>
